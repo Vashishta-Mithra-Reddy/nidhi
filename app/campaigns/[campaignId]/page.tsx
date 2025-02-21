@@ -12,10 +12,14 @@ import {
   updateDoc,
   arrayUnion,
   serverTimestamp,
+  query,
+  where,
+  orderBy,
 } from "firebase/firestore";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import Contribute from "@/components/Contribute"; 
 
 // Type for a campaign document
 interface Campaign {
@@ -30,7 +34,7 @@ interface Campaign {
   transactionHash?: string;
 }
 
-// Type for a reply
+// Type for a reply in the forum
 interface Reply {
   authorId: string;
   authorName: string;
@@ -38,7 +42,7 @@ interface Reply {
   createdAt: string; // or a Firestore Timestamp
 }
 
-// Type for a comment
+// Type for a comment in the forum
 interface CommentData {
   id: string;       // doc ID
   authorId: string; // UID of the person who asked the question
@@ -48,7 +52,12 @@ interface CommentData {
   replies: Reply[];
 }
 
-
+// Type for a single contribution
+interface Contribution {
+  contributorName: string;
+  amount: number;
+  timestamp: string; // stored or converted to string
+}
 
 export default function CampaignDetailsPage() {
   const { campaignId } = useParams(); // from the dynamic route
@@ -56,11 +65,14 @@ export default function CampaignDetailsPage() {
   const [comments, setComments] = useState<CommentData[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // For new comment
+  // Forum states
   const [commentText, setCommentText] = useState("");
-  // For replying
   const [replyText, setReplyText] = useState("");
   const [activeReplyId, setActiveReplyId] = useState<string | null>(null);
+
+  // Contributions states
+  const [contributions, setContributions] = useState<Contribution[]>([]);
+  const [showAllContributions, setShowAllContributions] = useState(false);
 
   const currentUser = auth.currentUser; // might be null if not logged in
 
@@ -103,7 +115,7 @@ export default function CampaignDetailsPage() {
           authorName: data.authorName,
           text: data.text,
           createdAt: data.createdAt,
-          replies: data.replies || []
+          replies: data.replies || [],
         });
       });
       // Sort by creation time if needed
@@ -116,7 +128,34 @@ export default function CampaignDetailsPage() {
     return () => unsubscribe();
   }, [campaignId]);
 
-  // 3. Post a new comment
+  // 3. Real-time listener for contributions (new "contributions" collection)
+  useEffect(() => {
+    if (!campaignId) return;
+    const cIdNumber = parseInt(campaignId as string, 10);
+
+    const q = query(
+      collection(db, "contributions"),
+      where("campaignId", "==", cIdNumber),
+      orderBy("timestamp", "desc")
+    );
+
+    const unsub = onSnapshot(q, (snapshot) => {
+      const updatedContributions: Contribution[] = [];
+      snapshot.forEach((docSnap) => {
+        const data = docSnap.data();
+        updatedContributions.push({
+          contributorName: data.contributorName,
+          amount: data.amount,
+          timestamp: data.timestamp?.toDate()?.toISOString() || "",
+        });
+      });
+      setContributions(updatedContributions);
+    });
+
+    return () => unsub();
+  }, [campaignId]);
+
+  // 4. Post a new comment
   const handlePostComment = async () => {
     if (!commentText.trim() || !currentUser) return;
     try {
@@ -126,7 +165,7 @@ export default function CampaignDetailsPage() {
         authorName: currentUser.displayName || "Anonymous",
         text: commentText,
         createdAt: new Date().toISOString(),
-        replies: []
+        replies: [],
       });
       setCommentText("");
     } catch (error) {
@@ -134,7 +173,7 @@ export default function CampaignDetailsPage() {
     }
   };
 
-  // 4. Post a reply to an existing comment
+  // 5. Post a reply to an existing comment
   const handlePostReply = async (commentDocId: string) => {
     if (!replyText.trim() || !currentUser) return;
     try {
@@ -145,8 +184,8 @@ export default function CampaignDetailsPage() {
           authorId: currentUser.uid,
           authorName: currentUser.displayName || "Creator",
           text: replyText,
-          createdAt: new Date().toISOString()
-        })
+          createdAt: new Date().toISOString(),
+        }),
       });
       setReplyText("");
       setActiveReplyId(null);
@@ -156,11 +195,11 @@ export default function CampaignDetailsPage() {
   };
 
   // If still loading or no campaign found
-  // if (loading) {
-  //   return <div className="p-4">Loading campaign...</div>;
-  // }
+  if (loading) {
+    return <div className="p-4 px-32 py-28">Loading campaign...</div>;
+  }
   if (!campaign) {
-    return <div className="p-4">Campaign not found.</div>;
+    return <div className="p-4 px-32 py-28">Campaign not found.</div>;
   }
 
   // Check if current user is the campaign owner
@@ -180,14 +219,49 @@ export default function CampaignDetailsPage() {
             <span className="font-semibold">Target Amount:</span> {campaign.targetAmount} ETH
           </div>
           <div>
-            <span className="font-semibold">Amount Raised:</span> {parseFloat(campaign.amountRaised.toFixed(4))} ETH
+            <span className="font-semibold">Amount Raised:</span> {campaign.amountRaised} ETH
           </div>
         </div>
+
+        {/* Contribute Button */}
+        <Contribute campaignId={campaign.campaignId} />
+      </div>
+
+      {/* Latest Contributions Section */}
+      <div className="mt-6 py-16">
+        <h3 className="text-2xl font-semibold">Latest Contributions</h3>
+        {contributions.length === 0 ? (
+          <p className="text- text-gray-500 py-12">No contributions yet.</p>
+        ) : (
+          <div className="mt-2 space-y-2 py-8">
+            {contributions
+              .slice(0, showAllContributions ? contributions.length : 3)
+              .map((c, idx) => (
+                <div key={idx} className="border-b pb-2">
+                  <p className="text-sm">
+                    <span className="font-semibold">{c.contributorName}</span> contributed{" "}
+                    <span className="font-semibold">{c.amount} ETH</span>
+                  </p>
+                  <p className="text-xs text-gray-500">
+                    {new Date(c.timestamp).toLocaleString()}
+                  </p>
+                </div>
+              ))}
+            {contributions.length > 3 && (
+              <button
+                onClick={() => setShowAllContributions(!showAllContributions)}
+                className="text-gray-600 text-sm mt-1"
+              >
+                {showAllContributions ? "Show Less" : "Show More"}
+              </button>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Forum Section */}
-      <section className="mt-12">
-        <h2 className="text-2xl font-bold text-gray-900 mb-4">Forum</h2>
+      <section className="mt-1">
+        <h2 className="text-2xl font-bold text-black mb-4">Forum</h2>
 
         {/* New Comment Input (only if logged in) */}
         {currentUser ? (
@@ -197,14 +271,12 @@ export default function CampaignDetailsPage() {
               value={commentText}
               onChange={(e) => setCommentText(e.target.value)}
             />
-            <Button className="mt-2" onClick={handlePostComment}>
+            <Button className="mt-2 bg-gray-500 text-sm" onClick={handlePostComment}>
               Post Comment
             </Button>
           </div>
         ) : (
-          <p className="mb-6 text-red-500">
-            You must be signed in to post comments.
-          </p>
+          <p className="mb-6 text-red-500">You must be signed in to post comments.</p>
         )}
 
         {/* Comments List */}
@@ -221,10 +293,7 @@ export default function CampaignDetailsPage() {
               {/* Replies */}
               <div className="ml-6 mt-4 space-y-4">
                 {comment.replies.map((reply, idx) => (
-                  <div
-                    key={idx}
-                    className="bg-gray-50 p-3 rounded border-l-4 border-blue-600"
-                  >
+                  <div key={idx} className="bg-gray-50 p-3 rounded border-l-4 border-gray-800">
                     <p className="text-gray-700">
                       <span className="font-semibold">{reply.authorName}:</span> {reply.text}
                     </p>
@@ -244,11 +313,8 @@ export default function CampaignDetailsPage() {
                           value={replyText}
                           onChange={(e) => setReplyText(e.target.value)}
                         />
-                        <div className="mt-2 space-x-2">
-                          <Button
-                            variant="default"
-                            onClick={() => handlePostReply(comment.id)}
-                          >
+                        <div className="mt-2 space-x-2 ">
+                          <Button variant="default" onClick={() => handlePostReply(comment.id)}>
                             Reply
                           </Button>
                           <Button
@@ -264,7 +330,7 @@ export default function CampaignDetailsPage() {
                       </div>
                     ) : (
                       <button
-                        className="text-blue-600 hover:underline"
+                        className="text-blue-400"
                         onClick={() => setActiveReplyId(comment.id)}
                       >
                         Reply
@@ -285,7 +351,7 @@ export default function CampaignDetailsPage() {
 function Textarea(props: React.TextareaHTMLAttributes<HTMLTextAreaElement>) {
   return (
     <textarea
-      className="w-full p-3 border border-gray-300 rounded"
+      className="w-full p-3 border border-gray-300 rounded-xl"
       {...props}
     />
   );
