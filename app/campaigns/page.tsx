@@ -22,6 +22,9 @@ interface Campaign {
 export default function CampaignsPage() {
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
   const [loading, setLoading] = useState(true);
+// New states for search & filter
+const [searchTerm, setSearchTerm] = useState("");
+const [sortOption, setSortOption] = useState<"newest" | "oldest" | "mostFunded" | "leastFunded">("newest");
 
   useEffect(() => {
     const fetchCampaigns = async () => {
@@ -44,6 +47,27 @@ export default function CampaignsPage() {
     fetchCampaigns();
   }, []);
 
+  // Filter campaigns by search term (case-insensitive)
+  const filteredCampaigns = campaigns.filter((campaign) => {
+    return (
+      campaign.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      campaign.description.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  });
+
+  // Sort the filtered campaigns based on selected option
+  let sortedCampaigns = [...filteredCampaigns];
+  if (sortOption === "newest") {
+    sortedCampaigns.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+  } else if (sortOption === "oldest") {
+    sortedCampaigns.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+  } else if (sortOption === "mostFunded") {
+    sortedCampaigns.sort((a, b) => b.amountRaised - a.amountRaised);
+  } else if (sortOption === "leastFunded") {
+    sortedCampaigns.sort((a, b) => a.amountRaised - b.amountRaised);
+  }
+
+
   // if (loading) {
   //   return <div className="p-4">Loading campaigns...</div>;
   // }
@@ -51,11 +75,35 @@ export default function CampaignsPage() {
   return (
     <div className="px-32 py-32 bg-white min-h-screen">
       <h1 className="text-3xl font-bold text-gray-900 mb-16">Explore Campaigns</h1>
-      {campaigns.length === 0 ? (
+      
+      {/* Search and Filter Controls */}
+      <div className="mb-6 flex flex-col md:flex-row items-center md:justify-between space-y-4 md:space-y-0 ">
+        <input
+          type="text"
+          placeholder="Search campaigns..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="p-2 border border-gray-300 rounded-lg w-full md:w-1/4"
+        />
+        <select
+          value={sortOption}
+          onChange={(e) =>
+            setSortOption(e.target.value as "newest" | "oldest" | "mostFunded" | "leastFunded")
+          }
+          className="p-2 border border-gray-300 rounded-lg"
+        >
+          <option value="newest">Newest</option>
+          <option value="oldest">Oldest</option>
+          <option value="mostFunded">Most Funded</option>
+          <option value="leastFunded">Least Funded</option>
+        </select>
+      </div>
+
+      {sortedCampaigns.length === 0 ? (
         <p>No campaigns found.</p>
       ) : (
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 ">
-          {campaigns.map((campaign) => (
+          {sortedCampaigns.map((campaign) => (
             <Link
               key={campaign.campaignId}
               href={`/campaigns/${campaign.campaignId}`}

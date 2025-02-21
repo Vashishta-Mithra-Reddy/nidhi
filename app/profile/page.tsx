@@ -128,7 +128,7 @@ const ProfilePage = () => {
   };
 
   return (
-    <div className="flex flex-col items-start justify-start min-h-screen text-black p-6 mt-10 wrapper px-32 py-28">
+    <div className="flex flex-col items-start justify-start min-h-screen text-black p-6 mt-10 wrapper px-32 py-20">
       <h1 className="text-4xl font-bold mb-12">Your Campaigns</h1>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 w-full">
