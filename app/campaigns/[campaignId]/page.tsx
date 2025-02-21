@@ -180,7 +180,7 @@ export default function CampaignDetailsPage() {
             <span className="font-semibold">Target Amount:</span> {campaign.targetAmount} ETH
           </div>
           <div>
-            <span className="font-semibold">Amount Raised:</span> {campaign.amountRaised} ETH
+            <span className="font-semibold">Amount Raised:</span> {parseFloat(campaign.amountRaised.toFixed(4))} ETH
           </div>
         </div>
       </div>

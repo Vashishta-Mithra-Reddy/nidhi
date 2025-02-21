@@ -49,8 +49,8 @@ export default function CampaignsPage() {
   }
 
   return (
-    <div className="px-10 py-16 bg-gray-100 min-h-screen">
-      <h1 className="text-3xl font-bold text-gray-900 mb-6">Explore Campaigns</h1>
+    <div className="px-32 py-32 bg-white min-h-screen">
+      <h1 className="text-3xl font-bold text-gray-900 mb-16">Explore Campaigns</h1>
       {campaigns.length === 0 ? (
         <p>No campaigns found.</p>
       ) : (
@@ -59,16 +59,16 @@ export default function CampaignsPage() {
             <Link
               key={campaign.campaignId}
               href={`/campaigns/${campaign.campaignId}`}
-              className="bg-white p-6 rounded-lg shadow hover:shadow-lg transition-shadow duration-200 block"
+              className="bg-white px-8 py-6 rounded-2xl shadow hover:shadow-lg transition-shadow duration-200 block"
             >
               <h2 className="text-xl font-bold text-gray-800">{campaign.title}</h2>
-              <p className="text-gray-600 mt-2">{campaign.description}</p>
-              <div className="mt-4 text-gray-700">
+              <p className="text-gray-500 mt-2">{campaign.description}</p>
+              <div className="mt-4 text-gray-400">
                 <div>
-                  <span className="font-semibold">Target Amount:</span> {campaign.targetAmount} ETH
+                  <span className="font-semibold">Target Amount:</span> <span className="text-gray-800">{campaign.targetAmount} Ξ</span>
                 </div>
                 <div>
-                  <span className="font-semibold">Amount Raised:</span> {campaign.amountRaised} ETH
+                  <span className="font-semibold">Amount Raised:</span> <span className="text-gray-800">{parseFloat(campaign.amountRaised.toFixed(4))} Ξ</span>
                 </div>
               </div>
             </Link>

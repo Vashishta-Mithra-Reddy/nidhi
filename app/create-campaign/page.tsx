@@ -18,7 +18,7 @@ const CreateCampaign = () => {
   const [loading, setLoading] = useState(false)
   const router = useRouter()
 
-  const contractAddress = "0x0C3DDeE094caEa602D06F559fC855b6FB7f59c6F"
+  const contractAddress = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS || ""
   const abi = [
     {
       inputs: [
@@ -43,6 +43,28 @@ const CreateCampaign = () => {
         toast.error("User is not authenticated")
         return
       }
+
+      // **Validate with Gemini API**
+      try {
+        const response = await fetch("/api/validate", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ title, description, targetAmount }),
+        });
+
+        const data = await response.json();
+
+        if (!response.ok || !data.isValid) {
+          toast.error("Campaign validation failed. Please ensure the title and description are realistic and authentic.");
+          return;
+        }
+      } catch (error) {
+        console.error("Validation request failed:", error);
+        toast.error("An error occurred while validating the campaign. Please try again.");
+      }
+
 
       if (!window.ethereum) throw new Error("Metamask is not installed")
       const provider = new ethers.BrowserProvider(window.ethereum)
