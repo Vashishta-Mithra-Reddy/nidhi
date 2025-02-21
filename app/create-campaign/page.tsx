@@ -86,7 +86,7 @@ const CreateCampaign = () => {
   }
 
   return (
-    <Card className="max-w-3xl mx-auto mt-40 mb-32">
+    <Card className="max-w-3xl mx-auto mt-40 mb-32 rounded-2xl py-5 px-4">
       <CardHeader>
         <CardTitle className="text-2xl">Create Campaign</CardTitle>
       </CardHeader>
@@ -94,17 +94,17 @@ const CreateCampaign = () => {
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-2">
             <Label htmlFor="title">Title</Label>
-            <Input id="title" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Enter campaign title" required />
+            <Input id="title" value={title} className="py-5" onChange={(e) => setTitle(e.target.value)} placeholder="Enter campaign title" required />
           </div>
           <div className="space-y-2">
             <Label htmlFor="description">Description</Label>
-            <Input id="description" value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Enter campaign description" required />
+            <Input id="description" value={description} className="py-5" onChange={(e) => setDescription(e.target.value)} placeholder="Enter campaign description" required />
           </div>
           <div className="space-y-2">
             <Label htmlFor="targetAmount">Target Amount (ETH)</Label>
-            <Input id="targetAmount" type="number" value={targetAmount} onChange={(e) => setTargetAmount(e.target.value)} placeholder="Enter target amount in ETH" required />
+            <Input id="targetAmount" type="number" className="py-5" value={targetAmount} onChange={(e) => setTargetAmount(e.target.value)} placeholder="Enter target amount in ETH" required />
           </div>
-          <Button type="submit" className="w-full" disabled={loading}>
+          <Button type="submit" className="w-full py-6 rounded-xl" disabled={loading}>
             {loading ? "Creating Campaign..." : "Create Campaign"}
           </Button>
         </form>

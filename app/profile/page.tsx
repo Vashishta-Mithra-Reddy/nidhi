@@ -133,7 +133,7 @@ const ProfilePage = () => {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 w-full">
         {campaigns.map((campaign) => (
-          <Card key={campaign.id} className="max-w-sm w-full overflow-hidden">
+          <Card key={campaign.id} className="max-w-sm w-full overflow-hidden rounded-2xl py-2 px-2">
             <div className="relative h-48">
               <img
                 src={campaign.image || "/placeholder-campaign.jpg"}
@@ -142,7 +142,7 @@ const ProfilePage = () => {
               />
               <Badge 
                 className={`absolute top-3 right-3 ${
-                  campaign.isActive ? 'bg-green-500' : 'bg-gray-500'
+                  campaign.isActive ? 'bg-green-300' : 'bg-gray-500'
                 } text-white text-sm font-bold px-2 py-1`}
               >
                 {campaign.isActive ? 'Active' : 'Closed'}
@@ -153,7 +153,7 @@ const ProfilePage = () => {
               <div className="flex justify-between items-start mb-2">
                 <h3 className="text-lg font-bold">{campaign.title}</h3>
                 <Badge variant="outline" className="bg-blue-100 text-blue-800 text-sm border-blue-300 px-3 py-1">
-                  Ξ {ethers.formatEther(campaign.amountRaised || '0')}
+                  Ξ {campaign.amountRaised || '0'} 
                 </Badge>
               </div>
               
@@ -166,12 +166,9 @@ const ProfilePage = () => {
                   ></div>
                 </div>
                 <div className="flex justify-between text-xs text-gray-600">
-                  <span>Raised: Ξ {ethers.formatEther(campaign.amountRaised || '0')}</span>
-                  <span>Target: Ξ {ethers.formatEther(campaign.targetAmount || '0')}</span>
-                </div>
-                <p>
-                  <span className="font-semibold">Created:</span> {formatDate(campaign.createdAt)}
-                </p>
+                    <span>Raised: Ξ {campaign.amountRaised || '0'}</span> {/* Keep as Ether */}
+                    <span>Target: Ξ {campaign.targetAmount || '0'}</span> {/* Keep as Ether */}
+                  </div>
               </div>
             </CardContent>
 
@@ -181,7 +178,7 @@ const ProfilePage = () => {
                   variant="destructive"
                   disabled={loading}
                   onClick={() => handleCampaignClose(campaign.id)}
-                  className="w-full"
+                  className="w-full bg-red-400 font-semibold rounded-xl py-6"
                 >
                   Close Campaign
                 </Button>
@@ -196,7 +193,7 @@ const ProfilePage = () => {
       </div>
 
       {showOtpModal && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
           <OtpComponent
             email={auth.currentUser?.email || ""}
             onVerified={performActionAfterOtpVerification}
