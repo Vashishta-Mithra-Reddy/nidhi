@@ -156,9 +156,9 @@ export default function CampaignDetailsPage() {
   };
 
   // If still loading or no campaign found
-  if (loading) {
-    return <div className="p-4">Loading campaign...</div>;
-  }
+  // if (loading) {
+  //   return <div className="p-4">Loading campaign...</div>;
+  // }
   if (!campaign) {
     return <div className="p-4">Campaign not found.</div>;
   }
@@ -235,7 +235,7 @@ export default function CampaignDetailsPage() {
                 ))}
 
                 {/* If the user is the campaign owner, allow replying */}
-                {isOwner && (
+                {currentUser && (
                   <div className="mt-2">
                     {activeReplyId === comment.id ? (
                       <div>

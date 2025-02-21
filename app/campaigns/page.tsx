@@ -44,9 +44,9 @@ export default function CampaignsPage() {
     fetchCampaigns();
   }, []);
 
-  if (loading) {
-    return <div className="p-4">Loading campaigns...</div>;
-  }
+  // if (loading) {
+  //   return <div className="p-4">Loading campaigns...</div>;
+  // }
 
   return (
     <div className="px-32 py-32 bg-white min-h-screen">
@@ -54,7 +54,7 @@ export default function CampaignsPage() {
       {campaigns.length === 0 ? (
         <p>No campaigns found.</p>
       ) : (
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 ">
           {campaigns.map((campaign) => (
             <Link
               key={campaign.campaignId}

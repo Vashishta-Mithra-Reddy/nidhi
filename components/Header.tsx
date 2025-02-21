@@ -55,7 +55,7 @@ const Header = () => {
                 <li key={link.name}>
                   <Link
                     href={link.path}
-                    className="text-sm sm:text-base hover:text-primary transition-colors"
+                    className="text-sm sm:text-base hover:text-primary hover:text-gray-300 hover:mb-1 transition-colors"
                   >
                     {link.name}
                   </Link>

@@ -124,7 +124,7 @@ const ProfilePage = () => {
   };
 
   const calculateProgress = (amountRaised: number, targetAmount: number) => {
-    return (amountRaised / targetAmount) * 100;
+    return ((amountRaised / targetAmount) * 100)<100?((amountRaised / targetAmount) * 100):100;
   };
 
   return (
@@ -153,7 +153,7 @@ const ProfilePage = () => {
               <div className="flex justify-between items-start mb-2">
                 <h3 className="text-lg font-bold">{campaign.title}</h3>
                 <Badge variant="outline" className="bg-blue-100 text-blue-800 text-sm border-blue-300 px-3 py-1">
-                  Ξ {campaign.amountRaised || '0'} 
+                  Ξ {parseFloat(campaign.amountRaised.toFixed(4)) || '0'} 
                 </Badge>
               </div>
               
@@ -166,8 +166,8 @@ const ProfilePage = () => {
                   ></div>
                 </div>
                 <div className="flex justify-between text-xs text-gray-600">
-                    <span>Raised: Ξ {campaign.amountRaised || '0'}</span> {/* Keep as Ether */}
-                    <span>Target: Ξ {campaign.targetAmount || '0'}</span> {/* Keep as Ether */}
+                    <span>Raised: Ξ {parseFloat(campaign.amountRaised.toFixed(4)) || '0'}</span> {/* Keep as Ether */}
+                    <span>Target: Ξ {parseFloat(campaign.targetAmount.toFixed(4)) || '0'}</span> {/* Keep as Ether */}
                   </div>
               </div>
             </CardContent>

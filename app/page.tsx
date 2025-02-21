@@ -4,7 +4,7 @@ import Link from "next/link";
 
 export default function Home() {
   return (
-    <div className="px-32 py-28 bg-white">
+    <div className="px-32 py-28 bg-white transition-all duration-300">
       {/* Hero Section */}
       <section className="text-center max-w-4xl mx-auto py-20">
         <h1 className="text-4xl font-bold text-gray-900 py-10">Empowering Student Startups with Decentralized Funding</h1>
