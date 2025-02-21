@@ -167,7 +167,7 @@ const ProfilePage = () => {
                 </div>
                 <div className="flex justify-between text-xs text-gray-600">
                     <span>Raised: Ξ {parseFloat(campaign.amountRaised.toFixed(4)) || '0'}</span> {/* Keep as Ether */}
-                    <span>Target: Ξ {parseFloat(campaign.targetAmount.toFixed(4)) || '0'}</span> {/* Keep as Ether */}
+                    <span>Target: Ξ {campaign.targetAmount || '0'}</span> {/* Keep as Ether */}
                   </div>
               </div>
             </CardContent>
