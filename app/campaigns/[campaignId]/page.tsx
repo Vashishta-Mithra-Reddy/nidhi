@@ -228,10 +228,10 @@ export default function CampaignDetailsPage() {
       </div>
 
       {/* Latest Contributions Section */}
-      <div className="mt-6 py-20">
+      <div className="mt-6 py-16">
         <h3 className="text-2xl font-semibold">Latest Contributions</h3>
         {contributions.length === 0 ? (
-          <p className="text- text-gray-500 py-6">No contributions yet.</p>
+          <p className="text- text-gray-500 py-12">No contributions yet.</p>
         ) : (
           <div className="mt-2 space-y-2 py-8">
             {contributions
@@ -260,7 +260,7 @@ export default function CampaignDetailsPage() {
       </div>
 
       {/* Forum Section */}
-      <section className="mt-4">
+      <section className="mt-1">
         <h2 className="text-2xl font-bold text-black mb-4">Forum</h2>
 
         {/* New Comment Input (only if logged in) */}
@@ -330,7 +330,7 @@ export default function CampaignDetailsPage() {
                       </div>
                     ) : (
                       <button
-                        className="text-gray-900"
+                        className="text-blue-400"
                         onClick={() => setActiveReplyId(comment.id)}
                       >
                         Reply
@@ -351,7 +351,7 @@ export default function CampaignDetailsPage() {
 function Textarea(props: React.TextareaHTMLAttributes<HTMLTextAreaElement>) {
   return (
     <textarea
-      className="w-full p-3 border border-gray-300 rounded-md"
+      className="w-full p-3 border border-gray-300 rounded-xl"
       {...props}
     />
   );
