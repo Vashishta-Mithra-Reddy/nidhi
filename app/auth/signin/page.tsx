@@ -14,7 +14,6 @@ export default function SignIn() {
 
   return (
     <div className="flex flex-col items-center justify-center h-screen">
-      <h1 className="text-2xl mb-4">Sign In</h1>
       <button
         className="px-4 py-2 bg-blue-600 text-white rounded"
       >
