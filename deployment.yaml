@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nidhi-app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: nidhi
+  template:
+    metadata:
+      labels:
+        app: nidhi
+    spec:
+      containers:
+        - name: nidhi-container
+          image: 748979174079.dkr.ecr.ap-south-1.amazonaws.com/nidhi:latest
+          ports:
+            - containerPort: 80

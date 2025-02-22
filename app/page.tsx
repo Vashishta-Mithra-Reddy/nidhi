@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { db } from "@/lib/firebase";
 import { collection, query, where, orderBy, limit, getDocs } from "firebase/firestore";
+import CircularText from "@/components/CircularText";
 
 // Define a TypeScript interface for a campaign
 interface Campaign {
@@ -49,18 +50,24 @@ export default function Home() {
   return (
     <div className="px-32 py-28 bg-white transition-all duration-300">
       {/* Hero Section */}
-      <section className="text-center max-w-4xl mx-auto py-20">
-        <h1 className="text-4xl font-bold text-gray-900 py-10">
-          Empowering Student Startups with Decentralized Funding
+      <section className="text-center max-w-4xl mx-auto pb-20">
+      <CircularText
+        text="PROJECT*NIDHI*"
+        onHover="speedUp"
+        spinDuration={20}
+        className="custom-class"
+      />
+        <h1 className="text-4xl font-bold text-gray-900 pt-20 pb-4">
+          Empowering Startups with Decentralized Funding
         </h1>
-        <p className="mt-8 text-lg text-gray-700">
+        <p className="mt-2 text-lg text-gray-700">
           Leverage blockchain-powered smart contracts for transparent funding,
           gain token incentives, and connect with expert mentors.
         </p>
         <div className="mt-4 space-x-4 py-12">
           <Link
             href="/campaigns"
-            className="px-8 py-3 bg-gray-400 font-bold text-white rounded-lg hover:bg-gray-600"
+            className="px-8 py-6 bg-gray-400 font-bold text-white rounded-2xl hover:bg-gray-600"
           >
             Explore Projects
           </Link>
@@ -80,15 +87,15 @@ export default function Home() {
               <Link
                 key={campaign.campaignId}
                 href={`/campaigns/${campaign.campaignId}`}
-                className="bg-white p-4 rounded-lg shadow hover:shadow-lg "
+                className="bg-white px-8 py-6 rounded-xl shadow hover:shadow-lg "
               >
                 <h3 className="text-lg font-semibold text-gray-900 py-2">
                   {campaign.title}
                 </h3>
-                <p className="text-gray-700">{campaign.description}</p>
+                <p className="text-gray-400">{campaign.description}</p>
                 <div className="mt-4 text-gray-700">
                   <div>
-                    <span className="font-semibold">Target Amount:</span> {campaign.targetAmount} ETH
+                    <span className="font-semibold text-gray-400">Target Amount:</span> {campaign.targetAmount} ETH
                   </div>
                 </div>
               </Link>
@@ -97,44 +104,6 @@ export default function Home() {
         )}
       </section>
 
-      {/* Key Benefits */}
-      <h1 className="text-left max-w-5xl mx-auto text-4xl font-bold text-gray-900 py-4 mt-8">
-        About Us
-      </h1>
-      <section className="mt-6 grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
-        <div className="bg-white p-6 rounded-lg shadow-md">
-          <h3 className="text-xl font-semibold text-gray-900">
-            Transparent Funding
-          </h3>
-          <p className="text-gray-700 mt-2">
-            Smart contracts ensure secure and transparent transactions.
-          </p>
-        </div>
-        <div className="bg-white p-6 rounded-lg shadow-md">
-          <h3 className="text-xl font-semibold text-gray-900">
-            Token Incentives
-          </h3>
-          <p className="text-gray-700 mt-2">
-            Earn rewards and engage investors through blockchain tokens.
-          </p>
-        </div>
-        <div className="bg-white p-6 rounded-lg shadow-md">
-          <h3 className="text-xl font-semibold text-gray-900">
-            AI Verification
-          </h3>
-          <p className="text-gray-700 mt-2">
-            AI-driven project authentication ensures credibility.
-          </p>
-        </div>
-        <div className="bg-white p-6 rounded-lg shadow-md">
-          <h3 className="text-xl font-semibold text-gray-900">
-            Mentorship Hub
-          </h3>
-          <p className="text-gray-700 mt-2">
-            Connect with industry experts and grow your startup.
-          </p>
-        </div>
-      </section>
     </div>
   );
 }
