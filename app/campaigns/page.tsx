@@ -1,96 +1,92 @@
-"use client";
+"use client"
 
-import { useEffect, useState } from "react";
-import Link from "next/link";
-import { db } from "@/lib/firebase";
-import { collection, getDocs, QueryDocumentSnapshot, DocumentData } from "firebase/firestore";
+import { useEffect, useState } from "react"
+import Link from "next/link"
+import { db } from "@/lib/firebase"
+import { collection, getDocs, type QueryDocumentSnapshot, type DocumentData } from "firebase/firestore"
+import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
+import { Card, CardContent, CardFooter } from "@/components/ui/card"
 
 // TypeScript interface for a campaign
 interface Campaign {
-  campaignId: number;
-  title: string;
-  description: string;
-  targetAmount: string;  // or number, depending on how you store it
-  amountRaised: number;  // or string
-  userId: string;        // Owner's UID
-  isActive: boolean;
-  createdAt: string;     // or a Firestore Timestamp
-  transactionHash?: string;
+  campaignId: number
+  title: string
+  description: string
+  targetAmount: string
+  amountRaised: number
+  userId: string
+  isActive: boolean
+  createdAt: string
+  transactionHash?: string
 }
 
-// A simple listing page that fetches campaigns from Firestore and displays them
 export default function CampaignsPage() {
-  const [campaigns, setCampaigns] = useState<Campaign[]>([]);
-  const [loading, setLoading] = useState(true);
-// New states for search & filter
-const [searchTerm, setSearchTerm] = useState("");
-const [sortOption, setSortOption] = useState<"newest" | "oldest" | "mostFunded" | "leastFunded">("newest");
+  const [campaigns, setCampaigns] = useState<Campaign[]>([])
+  const [loading, setLoading] = useState(true)
+  const [searchTerm, setSearchTerm] = useState("")
+  const [sortOption, setSortOption] = useState<"newest" | "oldest" | "mostFunded" | "leastFunded">("newest")
 
   useEffect(() => {
     const fetchCampaigns = async () => {
       try {
-        const querySnapshot = await getDocs(collection(db, "campaigns"));
-        const fetched: Campaign[] = [];
+        const querySnapshot = await getDocs(collection(db, "campaigns"))
+        const fetched: Campaign[] = []
         querySnapshot.forEach((doc: QueryDocumentSnapshot<DocumentData>) => {
-          fetched.push(doc.data() as Campaign);
-        });
-        // Sort campaigns by newest first, if desired
-        fetched.sort((a, b) => b.campaignId - a.campaignId);
-        setCampaigns(fetched);
+          fetched.push(doc.data() as Campaign)
+        })
+        fetched.sort((a, b) => b.campaignId - a.campaignId)
+        setCampaigns(fetched)
       } catch (error) {
-        console.error("Error fetching campaigns:", error);
+        console.error("Error fetching campaigns:", error)
       } finally {
-        setLoading(false);
+        setLoading(false)
       }
-    };
+    }
 
-    fetchCampaigns();
-  }, []);
+    fetchCampaigns()
+  }, [])
 
-  // Filter campaigns by search term (case-insensitive)
   const filteredCampaigns = campaigns.filter((campaign) => {
     return (
       campaign.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       campaign.description.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-  });
+    )
+  })
 
-  // Sort the filtered campaigns based on selected option
-  let sortedCampaigns = [...filteredCampaigns];
+  const sortedCampaigns = [...filteredCampaigns]
   if (sortOption === "newest") {
-    sortedCampaigns.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    sortedCampaigns.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
   } else if (sortOption === "oldest") {
-    sortedCampaigns.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+    sortedCampaigns.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime())
   } else if (sortOption === "mostFunded") {
-    sortedCampaigns.sort((a, b) => b.amountRaised - a.amountRaised);
+    sortedCampaigns.sort((a, b) => b.amountRaised - a.amountRaised)
   } else if (sortOption === "leastFunded") {
-    sortedCampaigns.sort((a, b) => a.amountRaised - b.amountRaised);
+    sortedCampaigns.sort((a, b) => a.amountRaised - b.amountRaised)
   }
 
-
-  // if (loading) {
-  //   return <div className="p-4">Loading campaigns...</div>;
-  // }
+  const calculateProgress = (amountRaised: number, targetAmount: number) => {
+    return (amountRaised / Number.parseFloat(targetAmount)) * 100 < 100
+      ? (amountRaised / Number.parseFloat(targetAmount)) * 100
+      : 100
+  }
 
   return (
-    <div className="px-32 py-32 bg-white min-h-screen">
-      <h1 className="text-3xl font-bold text-gray-900 mb-16">Explore Campaigns</h1>
-      
-      {/* Search and Filter Controls */}
-      <div className="mb-6 flex flex-col md:flex-row items-center md:justify-between space-y-4 md:space-y-0 ">
+    <div className="flex flex-col items-start justify-start min-h-screen text-black p-6 mt-10 wrapper px-32 py-28">
+      <h1 className="text-4xl font-bold mb-12">Explore Campaigns</h1>
+
+      <div className="mb-6 flex flex-col md:flex-row items-center md:justify-between space-y-4 md:space-y-0 w-full">
         <input
           type="text"
           placeholder="Search campaigns..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="p-2 border border-gray-300 rounded-lg w-full md:w-1/4"
+          className="p-2 border border-gray-300 rounded-xl py-3 px-5 w-full md:w-1/4"
         />
         <select
           value={sortOption}
-          onChange={(e) =>
-            setSortOption(e.target.value as "newest" | "oldest" | "mostFunded" | "leastFunded")
-          }
-          className="p-2 border border-gray-300 rounded-lg"
+          onChange={(e) => setSortOption(e.target.value as "newest" | "oldest" | "mostFunded" | "leastFunded")}
+          className="p-2 border border-gray-300 rounded-lg py-3 px-5 cursor-pointer"
         >
           <option value="newest">Newest</option>
           <option value="oldest">Oldest</option>
@@ -102,27 +98,53 @@ const [sortOption, setSortOption] = useState<"newest" | "oldest" | "mostFunded" 
       {sortedCampaigns.length === 0 ? (
         <p>No campaigns found.</p>
       ) : (
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 ">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6 w-full">
           {sortedCampaigns.map((campaign) => (
-            <Link
+            <Card
               key={campaign.campaignId}
-              href={`/campaigns/${campaign.campaignId}`}
-              className="bg-white px-8 py-6 rounded-2xl shadow hover:shadow-lg transition-shadow duration-200 block"
+              className={`max-w-sm w-full overflow-hidden rounded-2xl py-2 px-2 ${!campaign.isActive ? "opacity-50" : ""}`}
             >
-              <h2 className="text-xl font-bold text-gray-800">{campaign.title}</h2>
-              <p className="text-gray-500 mt-2">{campaign.description}</p>
-              <div className="mt-4 text-gray-400">
-                <div>
-                  <span className="font-semibold">Target Amount:</span> <span className="text-gray-800">{campaign.targetAmount} Ξ</span>
+              <CardContent className="pt-4 pb-2">
+                <div className="flex justify-between items-start mb-2">
+                  <h3 className="text-lg font-bold">{campaign.title}</h3>
+                  <Badge variant="outline" className="bg-blue-100 text-blue-800 text-sm border-blue-300 px-3 py-1">
+                    Ξ {Number.parseFloat(campaign.amountRaised.toFixed(4)) || "0"}
+                  </Badge>
                 </div>
-                <div>
-                  <span className="font-semibold">Amount Raised:</span> <span className="text-gray-800">{parseFloat(campaign.amountRaised.toFixed(4))} Ξ</span>
+
+                <div className="space-y-2 text-sm">
+                  <p className="line-clamp-2">{campaign.description}</p>
+                  <div className="w-full bg-gray-200 rounded-full h-2.5">
+                    <div
+                      className="bg-blue-600 h-2.5 rounded-full"
+                      style={{ width: `${calculateProgress(campaign.amountRaised, campaign.targetAmount)}%` }}
+                    ></div>
+                  </div>
+                  <div className="flex justify-between text-xs text-gray-600">
+                    <span>Raised: Ξ {Number.parseFloat(campaign.amountRaised.toFixed(4)) || "0"}</span>
+                    <span>Target: Ξ {campaign.targetAmount || "0"}</span>
+                  </div>
                 </div>
-              </div>
-            </Link>
+              </CardContent>
+
+              <CardFooter className="pt-2 pb-4">
+                {campaign.isActive ? (
+                  <Link className="w-full" href={`/campaigns/${campaign.campaignId}`} passHref>
+                    <Button className="w-full bg-blue-400 font-semibold rounded-xl py-6 hover:bg-blue-500">
+                      Contribute
+                    </Button>
+                  </Link>
+                ) : (
+                  <Button disabled className="w-full bg-gray-500 font-semibold rounded-xl py-6">
+                    Campaign Closed
+                  </Button>
+                )}
+              </CardFooter>
+            </Card>
           ))}
         </div>
       )}
     </div>
-  );
+  )
 }
+

@@ -131,10 +131,10 @@ const ProfilePage = () => {
     <div className="flex flex-col items-start justify-start min-h-screen text-black p-6 mt-10 wrapper px-32 py-28">
       <h1 className="text-4xl font-bold mb-12">Your Campaigns</h1>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 w-full">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6 w-full">
         {campaigns.map((campaign) => (
           <Card key={campaign.id} className="max-w-sm w-full overflow-hidden rounded-2xl py-2 px-2">
-            <div className="relative h-48">
+            {/* <div className="relative h-16">
               <img
                 src={campaign.image || "/placeholder-campaign.jpg"}
                 alt={campaign.title}
@@ -147,7 +147,7 @@ const ProfilePage = () => {
               >
                 {campaign.isActive ? 'Active' : 'Closed'}
               </Badge>
-            </div>
+            </div> */}
 
             <CardContent className="pt-4 pb-2">
               <div className="flex justify-between items-start mb-2">
@@ -181,6 +181,15 @@ const ProfilePage = () => {
                   className="w-full bg-red-400 font-semibold rounded-xl py-6"
                 >
                   Close Campaign
+                </Button>
+              )}
+              {!campaign.isActive && (
+                <Button
+                  disabled={loading}
+                  onClick={() => handleCampaignClose(campaign.id)}
+                  className="w-full bg-gray-400 font-semibold rounded-xl py-6 hover:bg-gray-500/80"
+                >
+                  Campaign Closed
                 </Button>
               )}
             </CardFooter>
