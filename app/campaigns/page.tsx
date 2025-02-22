@@ -65,7 +65,7 @@ export default function CampaignsPage() {
     sortedCampaigns.sort((a, b) => a.amountRaised - b.amountRaised)
   }
 
-  const calculateProgress = (amountRaised: number, targetAmount: number) => {
+  const calculateProgress = (amountRaised: number, targetAmount: string) => {
     return (amountRaised / Number.parseFloat(targetAmount)) * 100 < 100
       ? (amountRaised / Number.parseFloat(targetAmount)) * 100
       : 100
