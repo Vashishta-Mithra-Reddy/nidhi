@@ -5,6 +5,10 @@ import { useEffect, useState } from "react";
 import { db } from "@/lib/firebase";
 import { collection, query, where, orderBy, limit, getDocs } from "firebase/firestore";
 import CircularText from "@/components/CircularText";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { CardFooter } from "@/components/ui/card";
 
 // Define a TypeScript interface for a campaign
 interface Campaign {
@@ -47,6 +51,12 @@ export default function Home() {
     fetchTrendingCampaigns();
   }, []);
 
+  const calculateProgress = (amountRaised: number, targetAmount: string) => {
+    return (amountRaised / Number.parseFloat(targetAmount)) * 100 < 100
+      ? (amountRaised / Number.parseFloat(targetAmount)) * 100
+      : 100
+  }
+
   return (
     <div className="px-32 py-28 bg-white transition-all duration-300">
       {/* Hero Section */}
@@ -75,30 +85,48 @@ export default function Home() {
       </section>
 
       {/* Trending Projects */}
-      <section className="mt-12 max-w-5xl mx-auto py-12">
-        <h2 className="text-4xl font-bold text-gray-900 py-4">Trending Projects</h2>
-        {loading ? (
+      {/* Trending Projects Section */}
+      <section className="w-full mt-12 mb-2">
+        <h2 className="text-3xl font-bold mb-6">Trending Projects</h2>
+        {1<0 ? (
           <p>Loading trending projects...</p>
         ) : trendingCampaigns.length === 0 ? (
           <p>No trending projects found.</p>
         ) : (
-          <div className="mt-6 grid md:grid-cols-3 gap-6 ">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 w-full mt-16">
             {trendingCampaigns.map((campaign) => (
-              <Link
-                key={campaign.campaignId}
-                href={`/campaigns/${campaign.campaignId}`}
-                className="bg-white px-8 py-6 rounded-xl shadow hover:shadow-lg "
-              >
-                <h3 className="text-lg font-semibold text-gray-900 py-2">
-                  {campaign.title}
-                </h3>
-                <p className="text-gray-400">{campaign.description}</p>
-                <div className="mt-4 text-gray-700">
-                  <div>
-                    <span className="font-semibold text-gray-400">Target Amount:</span> {campaign.targetAmount} ETH
+              <Card key={campaign.campaignId} className="max-w-sm w-full overflow-hidden rounded-2xl py-2 px-2">
+                <CardContent className="pt-4 pb-2">
+                  <div className="flex justify-between items-start mb-2">
+                    <h3 className="text-lg font-bold">{campaign.title}</h3>
+                    <Badge variant="outline" className="bg-blue-100 text-blue-800 text-sm border-blue-300 px-3 py-1">
+                      Ξ {Number.parseFloat(campaign.amountRaised.toFixed(4)) || "0"}
+                    </Badge>
                   </div>
-                </div>
-              </Link>
+
+                  <div className="space-y-2 text-sm">
+                    <p className="line-clamp-2">{campaign.description}</p>
+                    <div className="w-full bg-gray-200 rounded-full h-2.5">
+                      <div
+                        className="bg-blue-600 h-2.5 rounded-full"
+                        style={{ width: `${calculateProgress(campaign.amountRaised, campaign.targetAmount)}%` }}
+                      ></div>
+                    </div>
+                    <div className="flex justify-between text-xs text-gray-600">
+                      <span>Raised: Ξ {Number.parseFloat(campaign.amountRaised.toFixed(4)) || "0"}</span>
+                      <span>Target: Ξ {campaign.targetAmount || "0"}</span>
+                    </div>
+                  </div>
+                </CardContent>
+
+                <CardFooter className="pt-2 pb-4">
+                  <Link className="w-full" href={`/campaigns/${campaign.campaignId}`} passHref>
+                    <Button className="w-full bg-blue-500 font-semibold rounded-xl py-6 hover:bg-blue-600">
+                      Contribute
+                    </Button>
+                  </Link>
+                </CardFooter>
+              </Card>
             ))}
           </div>
         )}
