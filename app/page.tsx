@@ -121,7 +121,7 @@ export default function Home() {
 
                 <CardFooter className="pt-2 pb-4">
                   <Link className="w-full" href={`/campaigns/${campaign.campaignId}`} passHref>
-                    <Button className="w-full bg-blue-500 font-semibold rounded-xl py-6 hover:bg-blue-600">
+                    <Button className="w-full bg-blue-400 font-semibold rounded-xl py-6 hover:bg-blue-500">
                       Contribute
                     </Button>
                   </Link>
