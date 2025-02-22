@@ -224,7 +224,7 @@ export default function CampaignDetailsPage() {
         </div>
 
         {/* Contribute Button */}
-        <Contribute campaignId={0} />
+        <Contribute campaignId={campaign.campaignId} />
       </div>
 
       {/* Latest Contributions Section */}

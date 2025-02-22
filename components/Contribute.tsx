@@ -25,7 +25,7 @@ export default function Contribute({ campaignId }: ContributeProps) {
   const [loading, setLoading] = useState(false);
 
   const currentUser = auth.currentUser;
-  const contractAddress = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS || "";
+  const contractAddress = "0x0C3DDeE094caEa602D06F559fC855b6FB7f59c6F";
 
   const handleContribute = async () => {
     if (!amount || isNaN(Number(amount)) || Number(amount) <= 0) {
