@@ -185,7 +185,7 @@ const ProfilePage = () => {
               )}
               {!campaign.isActive && (
                 <Button
-                  disabled={loading}
+                  disabled
                   onClick={() => handleCampaignClose(campaign.id)}
                   className="w-full bg-gray-400 font-semibold rounded-xl py-6 hover:bg-gray-500/80"
                 >
