@@ -67,7 +67,7 @@ export default function Home() {
         <div className="mt-4 space-x-4 py-12">
           <Link
             href="/campaigns"
-            className="px-8 py-6 bg-gray-400 font-bold text-white rounded-2xl hover:bg-gray-600 bg-[url('/graidentx.png')] bg-cover bg-start"
+            className="px-8 py-6 bg-gray-400 font-bold text-white rounded-2xl hover:bg-gray-600"
           >
             Explore Projects
           </Link>
