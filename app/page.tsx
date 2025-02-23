@@ -60,7 +60,7 @@ export default function Home() {
   return (
     <div className="px-32 py-28 bg-white transition-all duration-300">
       {/* Hero Section */}
-      <section className="text-center max-w-4xl mx-auto pb-20">
+      <section className="text-center max-w-5xl mx-auto pb-20">
       
       <CircularText
         text="PROJECT*NIDHI*"
@@ -78,7 +78,7 @@ export default function Home() {
         <div className="mt-4 space-x-4 py-12">
           <Link
             href="/campaigns"
-            className="px-8 py-6 bg-gray-400 font-bold text-white rounded-2xl hover:bg-gray-600"
+            className="px-16 py-6 bg-gray-400 font-bold text-white rounded-2xl hover:bg-gray-600"
           >
             Explore Projects
           </Link>
