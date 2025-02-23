@@ -20,6 +20,9 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Contribute from "@/components/Contribute"; 
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
+import Loading from "@/app/loading";
 
 // Type for a campaign document
 interface Campaign {
@@ -173,6 +176,12 @@ export default function CampaignDetailsPage() {
     }
   };
 
+  const calculateProgress = (amountRaised: number, targetAmount: string) => {
+    return (amountRaised / Number.parseFloat(targetAmount)) * 100 < 100
+      ? (amountRaised / Number.parseFloat(targetAmount)) * 100
+      : 100
+  }
+
   // 5. Post a reply to an existing comment
   const handlePostReply = async (commentDocId: string) => {
     if (!replyText.trim() || !currentUser) return;
@@ -196,7 +205,7 @@ export default function CampaignDetailsPage() {
 
   // If still loading or no campaign found
   if (loading) {
-    return <div className="p-4 px-32 py-28">Loading campaign...</div>;
+    return <Loading/>;
   }
   if (!campaign) {
     return <div className="p-4 px-32 py-28">Campaign not found.</div>;
@@ -206,29 +215,54 @@ export default function CampaignDetailsPage() {
   const isOwner = currentUser && currentUser.uid === campaign.userId;
 
   return (
-    <div className="container mx-auto px-32 py-28">
+    <div className="container mx-auto px-32 py-28 transition-all duration-300">
       {/* Campaign Details */}
-      <div className="bg-white p-6 rounded-lg shadow-md">
-        {/* If you have a campaign image field, display it here */}
-        {/* Example: <Image src={campaign.imageUrl} alt={campaign.title} ... /> */}
+      {/* <div className="bg-white overflow-hidden rounded-2xl py-2 px-2">
 
         <h1 className="text-3xl font-bold mt-4">{campaign.title}</h1>
         <p className="mt-2 text-gray-700">{campaign.description}</p>
         <div className="mt-4 flex space-x-8">
           <div>
-            <span className="font-semibold">Target Amount:</span> {campaign.targetAmount} ETH
+            <span className="font-semibold">Target Amount:</span> {campaign.targetAmount} Ξ
           </div>
           <div>
-            <span className="font-semibold">Amount Raised:</span> {parseFloat(campaign.amountRaised.toFixed(4))} ETH
+            <span className="font-semibold">Amount Raised:</span> {parseFloat(campaign.amountRaised.toFixed(4))} Ξ
           </div>
         </div>
 
-        {/* Contribute Button */}
         <Contribute campaignId={campaign.campaignId} />
-      </div>
+      </div> */}
+
+      <Card key={campaign.campaignId} className="max-w-full w-full overflow-hidden rounded-2xl py-2 px-2">
+            <CardContent className="pt-4 pb-2">
+              <div className="flex justify-between items-start mb-2">
+                <h3 className="text-3xl font-bold pb-2">{campaign.title}</h3>
+                <Badge variant="outline" className="bg-blue-100 text-blue-800 text-sm border-blue-300 px-3 py-1">
+                  Ξ {parseFloat(campaign.amountRaised.toFixed(4)) || '0'} 
+                </Badge>
+              </div>
+              
+              <div className="space-y-2 text-sm">
+                <p className="line-clamp-2 text-lg pb-2 text-gray-700">{campaign.description}</p>
+                <div className="w-full bg-gray-200 rounded-full h-2.5">
+                  <div 
+                    className="bg-blue-600 h-2.5 rounded-full" 
+                    style={{ width: `${calculateProgress(campaign.amountRaised, campaign.targetAmount)}%` }}
+                  ></div>
+                </div>
+                <div className="flex justify-between text-xs text-gray-600">
+                    <span>Raised: Ξ {parseFloat(campaign.amountRaised.toFixed(4)) || '0'}</span> {/* Keep as Ether */}
+                    <span>Target: Ξ {campaign.targetAmount || '0'}</span> {/* Keep as Ether */}
+                  </div>
+              </div>
+            </CardContent>
+            <CardFooter>
+            <Contribute campaignId={campaign.campaignId} />
+            </CardFooter>
+      </Card>
 
       {/* Latest Contributions Section */}
-      <div className="mt-6 py-16">
+      <div className="mt-6 p-6">
         <h3 className="text-2xl font-semibold">Latest Contributions</h3>
         {contributions.length === 0 ? (
           <p className="text- text-gray-500 py-12">No contributions yet.</p>
@@ -239,12 +273,13 @@ export default function CampaignDetailsPage() {
               .map((c, idx) => (
                 <div key={idx} className="border-b pb-2">
                   <p className="text-sm">
-                    <span className="font-semibold">{c.contributorName}</span> contributed{" "}
-                    <span className="font-semibold">{c.amount} ETH</span>
-                  </p>
-                  <p className="text-xs text-gray-500">
+                    
+                    <Badge variant="outline" className="bg-blue-100 text-blue-800 text-sm border-blue-300 px-3 py-1"><span className="font-semibold"> {c.amount} ETH</span></Badge>
+                    <span className="pl-1 text-gray-700">  {c.contributorName}</span>
+                    </p>
+                  {/* <p className="text-xs text-gray-500">
                     {new Date(c.timestamp).toLocaleString()}
-                  </p>
+                  </p> */}
                 </div>
               ))}
             {contributions.length > 3 && (
@@ -260,7 +295,7 @@ export default function CampaignDetailsPage() {
       </div>
 
       {/* Forum Section */}
-      <section className="mt-1">
+      <section className="mt-1 p-6">
         <h2 className="text-2xl font-bold text-black mb-4">Forum</h2>
 
         {/* New Comment Input (only if logged in) */}
@@ -283,12 +318,12 @@ export default function CampaignDetailsPage() {
         <div className="space-y-6">
           {comments.map((comment) => (
             <div key={comment.id} className="bg-white p-4 rounded shadow">
-              <p className="text-gray-800">
+              <p className="text-gray-800 ml-4">
                 <span className="font-semibold">{comment.authorName}:</span> {comment.text}
               </p>
-              <div className="text-sm text-gray-500">
+              {/* <div className="text-sm text-gray-500">
                 Posted on {new Date(comment.createdAt).toLocaleString()}
-              </div>
+              </div> */}
 
               {/* Replies */}
               <div className="ml-6 mt-4 space-y-4">
@@ -297,9 +332,9 @@ export default function CampaignDetailsPage() {
                     <p className="text-gray-700">
                       <span className="font-semibold">{reply.authorName}:</span> {reply.text}
                     </p>
-                    <div className="text-sm text-gray-500">
+                    {/* <div className="text-sm text-gray-500">
                       Replied on {new Date(reply.createdAt).toLocaleString()}
-                    </div>
+                    </div> */}
                   </div>
                 ))}
 

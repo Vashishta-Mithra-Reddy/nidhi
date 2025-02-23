@@ -1,0 +1,21 @@
+{
+    "family": "nidhi-task",
+    "networkMode": "awsvpc",
+    "requiresCompatibilities": ["FARGATE"],
+    "cpu": "256",
+    "memory": "512",
+    "executionRoleArn": "arn:aws:iam::748979174079:role/ecsTaskExecutionRole",
+    "containerDefinitions": [
+        {
+            "name": "nidhi-webapp",
+            "image": "748979174079.dkr.ecr.ap-south-1.amazonaws.com/nidhi-webapp:latest",
+            "portMappings": [
+                {
+                    "containerPort": 3000,
+                    "hostPort": 3000
+                }
+            ],
+            "essential": true
+        }
+    ]
+}

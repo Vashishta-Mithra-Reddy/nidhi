@@ -75,7 +75,7 @@ export default function CampaignsPage() {
     <div className="flex flex-col items-start justify-start min-h-screen text-black p-6 mt-10 wrapper px-32 py-28">
       <h1 className="text-4xl font-bold mb-12">Explore Campaigns</h1>
 
-      <div className="mb-6 flex flex-col md:flex-row items-center md:justify-between space-y-4 md:space-y-0 w-full">
+      <div className="mb-12 flex flex-col md:flex-row items-center md:justify-between space-y-4 md:space-y-0 w-full px-1">
         <input
           type="text"
           placeholder="Search campaigns..."
@@ -88,17 +88,17 @@ export default function CampaignsPage() {
           onChange={(e) => setSortOption(e.target.value as "newest" | "oldest" | "mostFunded" | "leastFunded")}
           className="p-2 border border-gray-300 rounded-lg py-3 px-5 cursor-pointer"
         >
-          <option value="newest">Newest</option>
-          <option value="oldest">Oldest</option>
-          <option value="mostFunded">Most Funded</option>
-          <option value="leastFunded">Least Funded</option>
+          <option value="newest" className="hover:cursor-pointer">Newest</option>
+          <option value="oldest" className="hover:cursor-pointer">Oldest</option>
+          <option value="mostFunded" className="hover:cursor-pointer">Most Funded</option>
+          <option value="leastFunded" className="hover:cursor-pointer">Least Funded</option>
         </select>
       </div>
 
       {sortedCampaigns.length === 0 ? (
         <p>No campaigns found.</p>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6 w-full">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6 w-full place-items-center">
           {sortedCampaigns.map((campaign) => (
             <Card
               key={campaign.campaignId}

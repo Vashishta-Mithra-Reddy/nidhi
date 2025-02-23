@@ -89,12 +89,12 @@ export default function Contribute({ campaignId }: ContributeProps) {
         value={amount}
         onChange={(e) => setAmount(e.target.value)}
         disabled={loading}
-        className="border p-2 rounded"
+        className="border p-2 rounded-xl px-6 py-3"
       />
       <button
         onClick={handleContribute}
         disabled={loading}
-        className="bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-700"
+        className="bg-blue-400 text-white px-6 py-3 rounded-xl hover:bg-blue-500"
       >
         {loading ? "Contributing..." : "Contribute"}
       </button>
