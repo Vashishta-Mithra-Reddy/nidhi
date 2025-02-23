@@ -68,7 +68,7 @@ export default function Home() {
         spinDuration={20}
         className="custom-class"
       />
-        <h1 className="text-4xl font-bold text-gray-900 pt-20 pb-4">
+        <h1 className="text-[36px] font-bold text-gray-900 pt-20 pb-4">
           Empowering Startups with Decentralized Funding
         </h1>
         <p className="mt-2 text-lg text-gray-700">

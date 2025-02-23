@@ -10,6 +10,7 @@ import { db, auth } from "@/lib/firebase";
 import { useAuth } from "@/context/AuthContext";
 import { collection, query, where, getDocs, doc, updateDoc } from "firebase/firestore";
 import { OtpComponent } from "@/components/OtpHandler";
+import Loading from "../loading";
 
 const ProfilePage = () => {
   const [campaigns, setCampaigns] = useState<any[]>([]);
