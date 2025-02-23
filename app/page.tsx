@@ -60,7 +60,7 @@ export default function Home() {
   return (
     <div className="px-32 py-28 bg-white transition-all duration-300">
       {/* Hero Section */}
-      <section className="text-center max-w-5xl mx-auto pb-20">
+      <section className="text-center max-w-5xl mx-auto pb-20 pt-3">
       
       <CircularText
         text="PROJECT*NIDHI*"
