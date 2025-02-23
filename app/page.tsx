@@ -61,6 +61,7 @@ export default function Home() {
     <div className="px-32 py-28 bg-white transition-all duration-300">
       {/* Hero Section */}
       <section className="text-center max-w-4xl mx-auto pb-20">
+      
       <CircularText
         text="PROJECT*NIDHI*"
         onHover="speedUp"
