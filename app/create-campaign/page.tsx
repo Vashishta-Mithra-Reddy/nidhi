@@ -126,7 +126,7 @@ const CreateCampaign = () => {
             <Label htmlFor="targetAmount">Target Amount (ETH)</Label>
             <Input id="targetAmount" type="number" className="py-5" value={targetAmount} onChange={(e) => setTargetAmount(e.target.value)} placeholder="Enter target amount in ETH" required />
           </div>
-          <Button type="submit" className="w-full py-6 rounded-xl" disabled={loading}>
+          <Button type="submit" className="w-full py-6 rounded-xl bg-blue-400 hover:bg-blue-500" disabled={loading}>
             {loading ? "Creating Campaign..." : "Create Campaign"}
           </Button>
         </form>
