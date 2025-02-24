@@ -11,6 +11,7 @@ import { useAuth } from "@/context/AuthContext";
 import { collection, query, where, getDocs, doc, updateDoc } from "firebase/firestore";
 import { OtpComponent } from "@/components/OtpHandler";
 import Loading from "../loading";
+import { useRouter } from "next/navigation"; 
 
 const ProfilePage = () => {
   const [campaigns, setCampaigns] = useState<any[]>([]);
@@ -18,6 +19,7 @@ const ProfilePage = () => {
   const [showOtpModal, setShowOtpModal] = useState<boolean>(false);
   const [currentAction, setCurrentAction] = useState<{ type: "close"; campaignId: string } | null>(null);
   const { user } = useAuth();
+  const router = useRouter(); 
 
   const contractAddress = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS || "";
   const abi = [
@@ -25,20 +27,20 @@ const ProfilePage = () => {
       inputs: [
         { internalType: "string", name: "_title", type: "string" },
         { internalType: "string", name: "_description", type: "string" },
-        { internalType: "uint256", name: "_targetAmount", type: "uint256" }
+        { internalType: "uint256", name: "_targetAmount", type: "uint256" },
       ],
       name: "createListing",
       outputs: [],
       stateMutability: "nonpayable",
-      type: "function"
+      type: "function",
     },
     {
       inputs: [{ internalType: "uint256", name: "_listingId", type: "uint256" }],
       name: "closeListing",
       outputs: [],
       stateMutability: "nonpayable",
-      type: "function"
-    }
+      type: "function",
+    },
   ];
 
   useEffect(() => {
@@ -49,10 +51,10 @@ const ProfilePage = () => {
         const userId = user.uid;
         const q = query(collection(db, "campaigns"), where("userId", "==", userId));
         const querySnapshot = await getDocs(q);
-        
-        const userCampaigns = querySnapshot.docs.map(doc => ({
+
+        const userCampaigns = querySnapshot.docs.map((doc) => ({
           id: doc.id,
-          ...doc.data()
+          ...doc.data(),
         }));
 
         setCampaigns(userCampaigns.reverse());
@@ -86,15 +88,13 @@ const ProfilePage = () => {
 
       const campaignRef = doc(db, "campaigns", currentAction.campaignId);
       await updateDoc(campaignRef, {
-        isActive: false
+        isActive: false,
       });
 
       toast.success("Campaign closed successfully.");
-      setCampaigns((prev) => 
-        prev.map(campaign => 
-          campaign.id === currentAction.campaignId 
-            ? {...campaign, isActive: false} 
-            : campaign
+      setCampaigns((prev) =>
+        prev.map((campaign) =>
+          campaign.id === currentAction.campaignId ? { ...campaign, isActive: false } : campaign
         )
       );
     } catch (error: any) {
@@ -125,7 +125,7 @@ const ProfilePage = () => {
   };
 
   const calculateProgress = (amountRaised: number, targetAmount: number) => {
-    return ((amountRaised / targetAmount) * 100)<100?((amountRaised / targetAmount) * 100):100;
+    return ((amountRaised / targetAmount) * 100) < 100 ? (amountRaised / targetAmount) * 100 : 100;
   };
 
   return (
@@ -134,7 +134,12 @@ const ProfilePage = () => {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6 w-full">
         {campaigns.map((campaign) => (
-          <Card key={campaign.id} className="max-w-sm w-full overflow-hidden rounded-2xl py-2 px-2">
+          <Card
+            key={campaign.id}
+            className="max-w-sm w-full overflow-hidden rounded-2xl py-2 px-2 cursor-pointer" // Add cursor-pointer
+            onClick={() => router.push(`/campaigns/${campaign.id}`)} // Navigate on card click
+          >
+            {/* Uncomment if you want to include the image */}
             {/* <div className="relative h-16">
               <img
                 src={campaign.image || "/placeholder-campaign.jpg"}
@@ -154,22 +159,22 @@ const ProfilePage = () => {
               <div className="flex justify-between items-start mb-2">
                 <h3 className="text-lg font-bold">{campaign.title}</h3>
                 <Badge variant="outline" className="bg-blue-100 text-blue-800 text-sm border-blue-300 px-3 py-1">
-                  Ξ {parseFloat(campaign.amountRaised.toFixed(4)) || '0'} 
+                  Ξ {parseFloat(campaign.amountRaised.toFixed(4)) || "0"}
                 </Badge>
               </div>
-              
+
               <div className="space-y-2 text-sm">
                 <p className="line-clamp-2">{campaign.description}</p>
                 <div className="w-full bg-gray-200 rounded-full h-2.5">
-                  <div 
-                    className="bg-blue-600 h-2.5 rounded-full" 
+                  <div
+                    className="bg-blue-600 h-2.5 rounded-full"
                     style={{ width: `${calculateProgress(campaign.amountRaised, campaign.targetAmount)}%` }}
                   ></div>
                 </div>
                 <div className="flex justify-between text-xs text-gray-600">
-                    <span>Raised: Ξ {parseFloat(campaign.amountRaised.toFixed(4)) || '0'}</span> {/* Keep as Ether */}
-                    <span>Target: Ξ {campaign.targetAmount || '0'}</span> {/* Keep as Ether */}
-                  </div>
+                  <span>Raised: Ξ {parseFloat(campaign.amountRaised.toFixed(4)) || "0"}</span>
+                  <span>Target: Ξ {campaign.targetAmount || "0"}</span>
+                </div>
               </div>
             </CardContent>
 
@@ -178,7 +183,10 @@ const ProfilePage = () => {
                 <Button
                   variant="destructive"
                   disabled={loading}
-                  onClick={() => handleCampaignClose(campaign.id)}
+                  onClick={(e) => {
+                    e.stopPropagation(); // Prevent card navigation
+                    handleCampaignClose(campaign.id);
+                  }}
                   className="w-full bg-red-400 font-semibold rounded-xl py-6"
                 >
                   Close Campaign
@@ -187,7 +195,6 @@ const ProfilePage = () => {
               {!campaign.isActive && (
                 <Button
                   disabled
-                  onClick={() => handleCampaignClose(campaign.id)}
                   className="w-full bg-gray-400 font-semibold rounded-xl py-6 hover:bg-gray-500/80"
                 >
                   Campaign Closed
