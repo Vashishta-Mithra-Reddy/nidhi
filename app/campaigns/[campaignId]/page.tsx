@@ -11,62 +11,60 @@ import {
   addDoc,
   updateDoc,
   arrayUnion,
-  serverTimestamp,
   query,
   where,
   orderBy,
 } from "firebase/firestore";
+import { onAuthStateChanged } from "firebase/auth"; // Import this to track auth changes
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import Contribute from "@/components/Contribute"; 
+import Contribute from "@/components/Contribute";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import Loading from "@/app/loading";
 
-// Type for a campaign document
+// Type definitions remain the same
 interface Campaign {
   campaignId: number;
   title: string;
   description: string;
-  targetAmount: string;  // or number
-  amountRaised: number;  // or string
-  userId: string;        // campaign owner's UID
+  targetAmount: string;
+  amountRaised: number;
+  userId: string;
   isActive: boolean;
-  createdAt: string;     // or a Firestore Timestamp
+  createdAt: string;
   transactionHash?: string;
 }
 
-// Type for a reply in the forum
 interface Reply {
   authorId: string;
   authorName: string;
   text: string;
-  createdAt: string; // or a Firestore Timestamp
+  createdAt: string;
 }
 
-// Type for a comment in the forum
 interface CommentData {
-  id: string;       // doc ID
-  authorId: string; // UID of the person who asked the question
+  id: string;
+  authorId: string;
   authorName: string;
   text: string;
-  createdAt: string; // or a Firestore Timestamp
+  createdAt: string;
   replies: Reply[];
 }
 
-// Type for a single contribution
 interface Contribution {
   contributorName: string;
   amount: number;
-  timestamp: string; // stored or converted to string
+  timestamp: string;
 }
 
 export default function CampaignDetailsPage() {
-  const { campaignId } = useParams(); // from the dynamic route
+  const { campaignId } = useParams();
   const [campaign, setCampaign] = useState<Campaign | null>(null);
   const [comments, setComments] = useState<CommentData[]>([]);
   const [loading, setLoading] = useState(true);
+  const [currentUser, setCurrentUser] = useState(auth.currentUser); // Track current user dynamically
 
   // Forum states
   const [commentText, setCommentText] = useState("");
@@ -77,9 +75,15 @@ export default function CampaignDetailsPage() {
   const [contributions, setContributions] = useState<Contribution[]>([]);
   const [showAllContributions, setShowAllContributions] = useState(false);
 
-  const currentUser = auth.currentUser; // might be null if not logged in
+  // 1. Listen to authentication state changes
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setCurrentUser(user); // Update currentUser when auth state changes
+    });
+    return () => unsubscribe(); // Cleanup on unmount
+  }, []);
 
-  // 1. Fetch the campaign details
+  // 2. Fetch the campaign details
   useEffect(() => {
     if (!campaignId) return;
     const fetchCampaign = async () => {
@@ -100,14 +104,13 @@ export default function CampaignDetailsPage() {
     };
 
     fetchCampaign();
-  }, [campaignId]);
+  }, [campaignId]); // Removed currentUser from dependencies since it’s handled separately
 
-  // 2. Real-time listener for comments subcollection
+  // 3. Real-time listener for comments subcollection
   useEffect(() => {
     if (!campaignId) return;
     const commentsRef = collection(db, "campaigns", campaignId as string, "comments");
 
-    // Listen to changes in the "comments" subcollection
     const unsubscribe = onSnapshot(commentsRef, (snapshot) => {
       const updatedComments: CommentData[] = [];
       snapshot.forEach((docSnap) => {
@@ -121,7 +124,6 @@ export default function CampaignDetailsPage() {
           replies: data.replies || [],
         });
       });
-      // Sort by creation time if needed
       updatedComments.sort((a, b) => {
         return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
       });
@@ -131,7 +133,7 @@ export default function CampaignDetailsPage() {
     return () => unsubscribe();
   }, [campaignId]);
 
-  // 3. Real-time listener for contributions (new "contributions" collection)
+  // 4. Real-time listener for contributions
   useEffect(() => {
     if (!campaignId) return;
     const cIdNumber = parseInt(campaignId as string, 10);
@@ -158,7 +160,7 @@ export default function CampaignDetailsPage() {
     return () => unsub();
   }, [campaignId]);
 
-  // 4. Post a new comment
+  // 5. Post a new comment
   const handlePostComment = async () => {
     if (!commentText.trim() || !currentUser) return;
     try {
@@ -179,15 +181,14 @@ export default function CampaignDetailsPage() {
   const calculateProgress = (amountRaised: number, targetAmount: string) => {
     return (amountRaised / Number.parseFloat(targetAmount)) * 100 < 100
       ? (amountRaised / Number.parseFloat(targetAmount)) * 100
-      : 100
-  }
+      : 100;
+  };
 
-  // 5. Post a reply to an existing comment
+  // 6. Post a reply to an existing comment
   const handlePostReply = async (commentDocId: string) => {
     if (!replyText.trim() || !currentUser) return;
     try {
       const commentRef = doc(db, "campaigns", campaignId as string, "comments", commentDocId);
-      // We'll push a new reply object into the "replies" array
       await updateDoc(commentRef, {
         replies: arrayUnion({
           authorId: currentUser.uid,
@@ -203,9 +204,9 @@ export default function CampaignDetailsPage() {
     }
   };
 
-  // If still loading or no campaign found
+  // Loading or no campaign found
   if (loading) {
-    return <Loading/>;
+    return <Loading />;
   }
   if (!campaign) {
     return <div className="p-4 px-32 py-28">Campaign not found.</div>;
@@ -217,55 +218,38 @@ export default function CampaignDetailsPage() {
   return (
     <div className="container mx-auto px-32 py-28 transition-all duration-300">
       {/* Campaign Details */}
-      {/* <div className="bg-white overflow-hidden rounded-2xl py-2 px-2">
-
-        <h1 className="text-3xl font-bold mt-4">{campaign.title}</h1>
-        <p className="mt-2 text-gray-700">{campaign.description}</p>
-        <div className="mt-4 flex space-x-8">
-          <div>
-            <span className="font-semibold">Target Amount:</span> {campaign.targetAmount} Ξ
-          </div>
-          <div>
-            <span className="font-semibold">Amount Raised:</span> {parseFloat(campaign.amountRaised.toFixed(4))} Ξ
-          </div>
-        </div>
-
-        <Contribute campaignId={campaign.campaignId} />
-      </div> */}
-
       <Card key={campaign.campaignId} className="max-w-full w-full overflow-hidden rounded-2xl py-2 px-2">
-            <CardContent className="pt-4 pb-2">
-              <div className="flex justify-between items-start mb-2">
-                <h3 className="text-3xl font-bold pb-2">{campaign.title}</h3>
-                <Badge variant="outline" className="bg-blue-100 text-blue-800 text-sm border-blue-300 px-3 py-1">
-                  Ξ {parseFloat(campaign.amountRaised.toFixed(4)) || '0'} 
-                </Badge>
-              </div>
-              
-              <div className="space-y-2 text-sm">
-                <p className="line-clamp-2 text-lg pb-2 text-gray-700">{campaign.description}</p>
-                <div className="w-full bg-gray-200 rounded-full h-2.5">
-                  <div 
-                    className="bg-blue-600 h-2.5 rounded-full" 
-                    style={{ width: `${calculateProgress(campaign.amountRaised, campaign.targetAmount)}%` }}
-                  ></div>
-                </div>
-                <div className="flex justify-between text-xs text-gray-600">
-                    <span>Raised: Ξ {parseFloat(campaign.amountRaised.toFixed(4)) || '0'}</span> {/* Keep as Ether */}
-                    <span>Target: Ξ {campaign.targetAmount || '0'}</span> {/* Keep as Ether */}
-                  </div>
-              </div>
-            </CardContent>
-            <CardFooter>
-            <Contribute campaignId={campaign.campaignId} />
-            </CardFooter>
+        <CardContent className="pt-4 pb-2">
+          <div className="flex justify-between items-start mb-2">
+            <h3 className="text-3xl font-bold pb-2">{campaign.title}</h3>
+            <Badge variant="outline" className="bg-blue-100 text-blue-800 text-sm border-blue-300 px-3 py-1">
+              Ξ {parseFloat(campaign.amountRaised.toFixed(4)) || "0"}
+            </Badge>
+          </div>
+          <div className="space-y-2 text-sm">
+            <p className="line-clamp-2 text-lg pb-2 text-gray-700">{campaign.description}</p>
+            <div className="w-full bg-gray-200 rounded-full h-2.5">
+              <div
+                className="bg-blue-600 h-2.5 rounded-full"
+                style={{ width: `${calculateProgress(campaign.amountRaised, campaign.targetAmount)}%` }}
+              ></div>
+            </div>
+            <div className="flex justify-between text-xs text-gray-600">
+              <span>Raised: Ξ {parseFloat(campaign.amountRaised.toFixed(4)) || "0"}</span>
+              <span>Target: Ξ {campaign.targetAmount || "0"}</span>
+            </div>
+          </div>
+        </CardContent>
+        <CardFooter>
+          <Contribute campaignId={campaign.campaignId} />
+        </CardFooter>
       </Card>
 
       {/* Latest Contributions Section */}
       <div className="mt-6 p-6">
         <h3 className="text-2xl font-semibold">Latest Contributions</h3>
         {contributions.length === 0 ? (
-          <p className="text- text-gray-500 py-12">No contributions yet.</p>
+          <p className="text-gray-500 py-12">No contributions yet.</p>
         ) : (
           <div className="mt-2 space-y-2 py-8">
             {contributions
@@ -273,13 +257,11 @@ export default function CampaignDetailsPage() {
               .map((c, idx) => (
                 <div key={idx} className="border-b pb-2">
                   <p className="text-sm">
-                    
-                    <Badge variant="outline" className="bg-blue-100 text-blue-800 text-sm border-blue-300 px-3 py-1"><span className="font-semibold"> {c.amount} ETH</span></Badge>
-                    <span className="pl-1 text-gray-700">  {c.contributorName}</span>
-                    </p>
-                  {/* <p className="text-xs text-gray-500">
-                    {new Date(c.timestamp).toLocaleString()}
-                  </p> */}
+                    <Badge variant="outline" className="bg-blue-100 text-blue-800 text-sm border-blue-300 px-3 py-1">
+                      <span className="font-semibold"> {c.amount} ETH</span>
+                    </Badge>
+                    <span className="pl-1 text-gray-700"> {c.contributorName}</span>
+                  </p>
                 </div>
               ))}
             {contributions.length > 3 && (
@@ -311,34 +293,28 @@ export default function CampaignDetailsPage() {
             </Button>
           </div>
         ) : (
-          <p className="mb-6 text-red-500">You must be signed in to post comments.</p>
+          <Badge variant="outline" className="bg-red-50 text-red-400 text-sm border-red-200 px-4 py-2 font-semibold mb-4">
+              You must be signed in to post comments.
+            </Badge>
         )}
 
         {/* Comments List */}
         <div className="space-y-6">
           {comments.map((comment) => (
-            <div key={comment.id} className="bg-white p-4 rounded shadow">
+            <div key={comment.id} className="bg-white py-4 px-2 rounded shadow">
               <p className="text-gray-800 ml-4">
                 <span className="font-semibold">{comment.authorName}:</span> {comment.text}
               </p>
-              {/* <div className="text-sm text-gray-500">
-                Posted on {new Date(comment.createdAt).toLocaleString()}
-              </div> */}
-
-              {/* Replies */}
               <div className="ml-6 mt-4 space-y-4">
                 {comment.replies.map((reply, idx) => (
                   <div key={idx} className="bg-gray-50 p-3 rounded border-l-4 border-gray-800">
                     <p className="text-gray-700">
                       <span className="font-semibold">{reply.authorName}:</span> {reply.text}
                     </p>
-                    {/* <div className="text-sm text-gray-500">
-                      Replied on {new Date(reply.createdAt).toLocaleString()}
-                    </div> */}
                   </div>
                 ))}
 
-                {/* If the user is the campaign owner, allow replying */}
+                {/* Reply input only if logged in */}
                 {currentUser && (
                   <div className="mt-2">
                     {activeReplyId === comment.id ? (
@@ -348,7 +324,7 @@ export default function CampaignDetailsPage() {
                           value={replyText}
                           onChange={(e) => setReplyText(e.target.value)}
                         />
-                        <div className="mt-2 space-x-2 ">
+                        <div className="mt-2 space-x-2">
                           <Button variant="default" onClick={() => handlePostReply(comment.id)}>
                             Reply
                           </Button>
@@ -382,12 +358,7 @@ export default function CampaignDetailsPage() {
   );
 }
 
-// A basic Textarea component if you don't already have one
+// Textarea component
 function Textarea(props: React.TextareaHTMLAttributes<HTMLTextAreaElement>) {
-  return (
-    <textarea
-      className="w-full p-3 border border-gray-300 rounded-xl"
-      {...props}
-    />
-  );
+  return <textarea className="w-full p-3 border border-gray-300 rounded-xl" {...props} />;
 }

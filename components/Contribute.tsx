@@ -1,10 +1,18 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ethers } from "ethers";
 import toast from "react-hot-toast";
-import { db,auth } from "@/lib/firebase";
-import { doc, updateDoc, getDoc, collection, addDoc, serverTimestamp } from "firebase/firestore";
+import { db, auth } from "@/lib/firebase";
+import {
+  doc,
+  updateDoc,
+  getDoc,
+  collection,
+  addDoc,
+  serverTimestamp,
+} from "firebase/firestore";
+import { onAuthStateChanged } from "firebase/auth"; // Import to track auth changes
 
 interface ContributeProps {
   campaignId: number;
@@ -23,11 +31,23 @@ const contractABI = [
 export default function Contribute({ campaignId }: ContributeProps) {
   const [amount, setAmount] = useState("");
   const [loading, setLoading] = useState(false);
+  const [currentUser, setCurrentUser] = useState(auth.currentUser); // Track user dynamically
 
-  const currentUser = auth.currentUser;
   const contractAddress = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS || "";
 
+  // Listen to authentication state changes
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setCurrentUser(user); // Update currentUser when auth state changes
+    });
+    return () => unsubscribe(); // Cleanup on unmount
+  }, []);
+
   const handleContribute = async () => {
+    if (!currentUser) {
+      toast.error("Please sign in to contribute.");
+      return;
+    }
     if (!amount || isNaN(Number(amount)) || Number(amount) <= 0) {
       toast.error("Please enter a valid contribution amount.");
       return;
@@ -39,7 +59,7 @@ export default function Contribute({ campaignId }: ContributeProps) {
 
       const provider = new ethers.BrowserProvider(window.ethereum);
       const signer = await provider.getSigner();
-      const userAddress = await signer.getAddress(); // Get contributor's wallet address
+      const userAddress = await signer.getAddress();
 
       const contract = new ethers.Contract(contractAddress, contractABI, signer);
 
@@ -57,10 +77,9 @@ export default function Contribute({ campaignId }: ContributeProps) {
 
         await updateDoc(campaignRef, { amountRaised: newAmountRaised });
 
-        // ✅ Save the contribution to Firestore
         await addDoc(collection(db, "contributions"), {
           campaignId,
-          contributorName: currentUser?.displayName || userAddress, // Can later be replaced with ENS name if needed
+          contributorName: currentUser?.displayName || userAddress,
           amount: Number(amount),
           timestamp: serverTimestamp(),
         });
@@ -85,18 +104,22 @@ export default function Contribute({ campaignId }: ContributeProps) {
         type="number"
         min="0"
         step="0.01"
-        placeholder="Enter ETH amount"
+        placeholder={currentUser ? "Enter ETH amount" : "Sign in to contribute"}
         value={amount}
         onChange={(e) => setAmount(e.target.value)}
-        disabled={loading}
+        disabled={loading || !currentUser}
         className="border p-2 rounded-xl px-6 py-3"
       />
       <button
         onClick={handleContribute}
-        disabled={loading}
-        className="bg-blue-400 text-white px-6 py-3 rounded-xl hover:bg-blue-500"
+        disabled={loading || !currentUser}
+        className={`text-white px-6 py-3 rounded-xl ${
+          currentUser && !loading
+            ? "bg-blue-400 hover:bg-blue-500"
+            : "bg-gray-400 cursor-not-allowed"
+        }`}
       >
-        {loading ? "Contributing..." : "Contribute"}
+        {loading ? "Contributing..." : currentUser ? "Contribute" : "Top right"}
       </button>
     </div>
   );
