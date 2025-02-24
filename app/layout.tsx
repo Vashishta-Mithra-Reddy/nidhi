@@ -15,7 +15,7 @@ const poppins = Poppins({
 
 export const metadata: Metadata = {
   title: "Nidhi",
-  description: "A blockchain based crop auction system.",
+  description: "A blockchain based crowdfunding system.",
 };
 
 export default function RootLayout({
