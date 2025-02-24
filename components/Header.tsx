@@ -37,13 +37,13 @@ const Header = () => {
   return (
     <motion.header
       className={`fixed top-0 left-0 right-0 z-40 transition-all duration-300 text-white px-16 ${
-        isScrolled ? "py-4" : "py-6"
+        isScrolled ? "py-2" : "py-4 bg-gray-400"
       }`}
     >
       <div
         className={`container mx-auto px-4 sm:px-6 lg:px-8 h-20 ${
-          isScrolled ? "bg-gray-400/60 backdrop-blur-md shadow-lg" : "bg-gray-400/60"
-        } rounded-3xl transition-all duration-300 py-12`}
+          isScrolled ? "bg-gray-400/60 backdrop-blur-md shadow-lg" : "bg-transparent"
+        } rounded-3xl transition-all duration-300`}
       >
         <div className="flex justify-between items-center h-full px-8">
           <Link href="/" className="hover:opacity-80 transition-opacity">
