@@ -58,24 +58,24 @@ export default function Home() {
   }
 
   return (
-    <div className="px-32 py-28 bg-white transition-all duration-300">
+    <div className="px-8 md:px-32 py-12 md:py-28 bg-white transition-all duration-300">
       {/* Hero Section */}
-      <section className="text-center max-w-5xl mx-auto pb-20 pt-3">
+      <section className="text-center max-w-5xl mx-auto pb-20 pt-8 md:pt-3">
       
       <CircularText
         text="PROJECT*NIDHI*"
         onHover="speedUp"
         spinDuration={20}
-        className="custom-class"
+        className="custom-class animate-in zoom-in-90 duration-700"
       />
-        <h1 className="text-[36px] font-bold text-gray-900 pt-20 pb-4">
+        <h1 className="text-[36px] font-bold text-gray-900 pt-12 md:pt-20 pb-4 animate-in slide-in-from-bottom-10 duration-500">
           Empowering Startups with Decentralized Funding
         </h1>
-        <p className="mt-2 text-lg text-gray-700">
+        <p className="mt-2 text-lg text-gray-700 animate-in slide-in-from-bottom-16 duration-700">
           Leverage blockchain-powered smart contracts for transparent funding,
           gain token incentives, and connect with expert mentors.
         </p>
-        <div className="mt-4 space-x-4 py-12">
+        <div className="mt-4 space-x-4 py-12 animate-in slide-in-from-bottom-24 duration-700">
           <Link
             href="/campaigns"
             className="px-16 py-6 bg-gray-400 font-bold text-white rounded-2xl hover:bg-gray-600"
@@ -87,14 +87,14 @@ export default function Home() {
 
       {/* Trending Projects */}
       {/* Trending Projects Section */}
-      <section className="w-full mt-12 mb-2">
-        <h2 className="text-3xl font-bold mb-6">Trending Projects</h2>
+      <section className="w-full mt-12 mb-2 flex-row items-center justify-center animate-in fade-in duration-700">
+        <h2 className="text-3xl font-bold mb-6 text-center md:text-start ">Trending Projects</h2>
         {1<0 ? (
           <p>Loading trending projects...</p>
         ) : trendingCampaigns.length === 0 ? (
-          <p>No trending projects found.</p>
+          <p className="animate-out fade-out duration-1000">No trending projects found.</p>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 w-full mt-16">
+          <div className="grid grid-cols-1 place-items-center sm:grid-cols-2 lg:grid-cols-3 gap-6 w-full mt-16 animate-in fade-in slide-in-from-left-8 duration-700">
             {trendingCampaigns.map((campaign) => (
               <Card key={campaign.campaignId} className="max-w-sm w-full overflow-hidden rounded-2xl py-2 px-2">
                 <CardContent className="pt-4 pb-2">

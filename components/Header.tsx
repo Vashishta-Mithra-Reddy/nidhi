@@ -36,20 +36,20 @@ const Header = () => {
 
   return (
     <motion.header
-      className={`fixed top-0 left-0 right-0 z-40 transition-all duration-300 text-white px-16 ${
-        isScrolled ? "py-3  " : "py-4 bg-gray-400"
+      className={`fixed top-0 left-0 right-0 z-40 transition-all duration-300 text-white px-8 md:px-16 ${
+        isScrolled ? "py-3" : "py-4 bg-gray-400"
       }`}
     >
       <div
-        className={`container mx-auto px-4 sm:px-6 lg:px-8 h-20 ${
+        className={`container mx-auto px-2 sm:px-6 lg:px-8 h-20 ${
           isScrolled ? "bg-gray-400/60 backdrop-blur-md shadow-lg" : "bg-transparent"
         } rounded-3xl transition-all duration-300`}
       >
         <div className="flex justify-between items-center h-full px-8">
           <Link href="/" className="hover:opacity-80 transition-opacity">
-            <h1 className="text-2xl sm:text-4xl font-samarkan">nidhi</h1>
+            <h1 className="text-4xl sm:text-4xl font-samarkan">nidhi</h1>
           </Link>
-          <nav>
+          <nav className="hidden md:block">
             <ul className="flex space-x-4 sm:space-x-6">
               {navLinks.map((link) => (
                 <li key={link.name}>

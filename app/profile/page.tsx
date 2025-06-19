@@ -139,12 +139,12 @@ const ProfilePage = () => {
   }
 
   return (
-    <div className="flex flex-col items-start justify-start min-h-screen text-black p-6 mt-10 wrapper px-32 py-28">
+    <div className="flex flex-col items-center md:items-start justify-start min-h-screen text-black p-6 mt-10 wrapper px-8 md:px-32 py-12 md:py-28 animate-in fade-in duration-700">
       <h1 className="text-4xl font-bold mb-12">Your Campaigns</h1>
 
       {user ? (
         campaigns.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6 w-full">
+          <div className="grid grid-cols-1 place-items-center sm:grid-cols-2 xl:grid-cols-3 gap-6 w-full animate-in slide-in-from-left-16 duration-700">
             {campaigns.map((campaign) => (
               <Card
                 key={campaign.id}

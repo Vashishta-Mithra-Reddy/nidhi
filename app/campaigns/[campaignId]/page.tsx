@@ -216,7 +216,7 @@ export default function CampaignDetailsPage() {
   const isOwner = currentUser && currentUser.uid === campaign.userId;
 
   return (
-    <div className="container mx-auto px-32 py-28 transition-all duration-300">
+    <div className="container mx-auto px-32 py-28 transition-all animate-in fade-in duration-700">
       {/* Campaign Details */}
       <Card key={campaign.campaignId} className="max-w-full w-full overflow-hidden rounded-2xl py-2 px-2">
         <CardContent className="pt-4 pb-2">

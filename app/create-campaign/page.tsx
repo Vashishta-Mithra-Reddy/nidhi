@@ -119,9 +119,10 @@ const CreateCampaign = () => {
   };
 
   return (
-    <Card className="max-w-3xl mx-auto mt-40 mb-32 rounded-2xl py-5 px-4 transition-colors duration-300">
+    <div className="px-8 md:px-0 animate-in fade-in slide-in-from-bottom-20 duration-700">    
+      <Card className="max-w-3xl mx-auto mt-24 md:mt-40 mb-32 rounded-2xl py-5 px-4 transition-colors duration-300">
       <CardHeader>
-        <CardTitle className="text-2xl">Create Campaign</CardTitle>
+        <CardTitle className="text-3xl font-bold">Create Campaign</CardTitle>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-6">
@@ -176,6 +177,8 @@ const CreateCampaign = () => {
         </form>
       </CardContent>
     </Card>
+    </div>
+
   );
 };
 

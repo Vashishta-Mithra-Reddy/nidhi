@@ -72,10 +72,10 @@ export default function CampaignsPage() {
   }
 
   return (
-    <div className="flex flex-col items-start justify-start min-h-screen text-black p-6 mt-10 wrapper px-32 py-28">
+    <div className="flex flex-col  items-center md:items-start justify-start min-h-screen text-black p-6 mt-10 wrapper px-8 md:px-32 py-16 md:py-28 animate-in fade-in duration-700">
       <h1 className="text-4xl font-bold mb-12">Explore Campaigns</h1>
 
-      <div className="mb-12 flex flex-col md:flex-row items-center md:justify-between space-y-4 md:space-y-0 w-full px-1">
+      <div className="mb-12 flex flex-row items-center md:justify-between space-y-4 md:space-y-0 w-full px-1">
         <input
           type="text"
           placeholder="Search campaigns..."
@@ -86,7 +86,7 @@ export default function CampaignsPage() {
         <select
           value={sortOption}
           onChange={(e) => setSortOption(e.target.value as "newest" | "oldest" | "mostFunded" | "leastFunded")}
-          className="p-2 border border-gray-300 rounded-lg py-3 px-5 cursor-pointer"
+          className="p-2 border border-gray-300 rounded-lg py-3 px-5 cursor-pointer hidden md:block"
         >
           <option value="newest" className="hover:cursor-pointer">Newest</option>
           <option value="oldest" className="hover:cursor-pointer">Oldest</option>
