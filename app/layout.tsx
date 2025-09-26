@@ -6,6 +6,7 @@ import Footer from "@/components/Footer";
 import { AuthProvider } from "@/context/AuthContext";
 import { Toaster } from "react-hot-toast";
 import BottomNav from "@/components/bottom-nav";
+import { Analytics } from "@vercel/analytics/next";
 
 // Configure Poppins with multiple weights
 const poppins = Poppins({
@@ -30,7 +31,10 @@ export default function RootLayout({
         <AuthProvider>
           <Toaster position="top-center" reverseOrder={false} />
           <Header />
-          <main className="flex-grow pt-20">{children}</main>
+          <main className="flex-grow pt-20">
+          <Analytics/>
+          {children}
+          </main>
           <BottomNav/>
           <Footer />
         </AuthProvider>
